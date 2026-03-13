@@ -6,13 +6,15 @@ import time
 from dijkstra import dijkstra
 
 def main():
-
+  
+  # Generate set of graph sizes
   N = [2**i for i in range(5, 14)]
   k = 20
 
   T = []
-
+  
   for n in N:
+    # Generate the random graph
     p = n / k
     er = nx.erdos_renyi_graph(n,p, seed=None, directed=False, create_using=None)
     for u, v in er.edges():
@@ -20,8 +22,9 @@ def main():
     
     t = []
     
-    print(np.log2(n))
+    # print(np.log2(n))
     
+    # Run the algorithm 20 times for each graph, find the shortest path between two randomly selected nodes
     for m in range(20):
       er_org = random.choice(list(er.nodes))
       er_dest = random.choice(list(er.nodes))
@@ -35,6 +38,8 @@ def main():
       t.append(end-start)
     
     T.append((1/(m+1))*sum(t))
+  
+  # Generate comparison function
   q_function=[]
   for ding in N:
     q_function.append(5.0e-7 * (ding**2) )
