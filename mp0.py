@@ -4,67 +4,30 @@ import numpy as np
 import random
 import time
 
-# input: [(edge 1, edge 2, weight)]
-def dijkstraV1(G, source, destination):
-  labels = {}
-  predecessors = {}
-  for node in G.nodes:
-    labels[node] = np.inf
-    predecessors[node] = None
-  # print(labels)
-  current_node = source
-  labels[current_node] = 0
-  visited_nodes = []
-  current_label = 0
-  while True:
-    for neighbour in G.neighbors(current_node):
-      if (labels[neighbour] > current_label+G[current_node][neighbour]["weight"]):
-        labels[neighbour] = current_label+G[current_node][neighbour]["weight"]
-        predecessors[neighbour] = current_node
-        
-    visited_nodes.append(current_node)
-    filtered_labels = {node: label for node, label in labels.items() if node not in visited_nodes}
-    current_node = min(filtered_labels, key=labels.get)
-    current_label = labels[current_node]
-    
-    if current_node == destination:
-      break
-    
-  # print(labels)
-  # print(predecessors)
-  
-  if labels[destination] == np.inf:
-    return []
-  
-  path = [destination]
-  next_node = predecessors[destination]
-  while (next_node != source and next_node is not None):
-    path.append(next_node)
-    next_node = predecessors[next_node]
-  path.append(source)
-  path.reverse()
-  return path
-
-def dijkstraV2(G, source, destination):
+def dijkstra(G, source, destination):
+  # Initialization: set distances (labels) for all nodes to infinity except for the source node
   distances = {node: np.inf for node in G.nodes()}
   distances[source] = 0
   predecessors = {node: None for node in G.nodes()}
+  
+  # Keep track of unvisited nodes (temporary labels)
   unvisited = list(G.nodes())
-  while unvisited:
-    current_node = min(unvisited, key=lambda node: distances[node])
+  while unvisited: # iterate until every node is checked
+    current_node = min(unvisited, key=lambda node: distances[node]) # choose the closest unvisited node from the source
     
-    if distances[current_node] == np.inf:
+    if distances[current_node] == np.inf: # break if the closest unvisited node still has infinite distance to the source
       break
     
-    unvisited.remove(current_node)
+    unvisited.remove(current_node) # remove the current node from the unvisited
     
-    for neighbor in G.neighbors(current_node):
+    for neighbor in G.neighbors(current_node): # check the distances from current node to neighbors
       weight = G[current_node][neighbor]['weight']
       new_dist = distances[current_node] + weight
       if new_dist < distances[neighbor]:
         distances[neighbor] = new_dist
         predecessors[neighbor] = current_node
   
+  # Find path to the node by tracing back all predecessors from the destination
   path = []
   next_node = destination
   while next_node is not None:
@@ -75,12 +38,13 @@ def dijkstraV2(G, source, destination):
   if path[0] == source:
     return path
   else:
+    # No path to the source could be found
     return []
 
 def main():
   G = nx.DiGraph()
   G.add_weighted_edges_from([('S', 'D', 8), ('S', 'E', 1), ('D', 'C', 3), ('E', 'C', 1), ('B', 'D', 2), ('C', 'A', 2), ('A', 'B', 1), ('B', 'H', 1), ('A', 'F', 5), ('F', 'H', 3), ('F', 'G', 1), ('H', 'G', 1), ('G', 'E', 1)])
-  path = dijkstraV2(G, 'S', 'G')
+  path = dijkstra(G, 'S', 'G')
   print(path)
 
   N = [2**i for i in range(5,14)]
@@ -105,7 +69,7 @@ def main():
       # print(er_org, er_dest)
       
       start = time.time()
-      er_path = dijkstraV2(er, er_org, er_dest)
+      er_path = dijkstra(er, er_org, er_dest)
       end = time.time()
       
       t.append(end-start)
@@ -126,8 +90,3 @@ def main():
   
 if __name__ == "__main__":
   main()
-    
-    
-  
-# nx.draw(G, with_labels=True)
-# plt.show()
