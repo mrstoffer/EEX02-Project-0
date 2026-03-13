@@ -7,7 +7,7 @@ from dijkstra import dijkstra
 
 def main():
 
-  N = [2**i for i in range(5,14)]
+  N = [2**i for i in range(5, 14)]
   k = 20
 
   T = []
@@ -35,19 +35,20 @@ def main():
       t.append(end-start)
     
     T.append((1/(m+1))*sum(t))
-    
-  with open("results/results.txt", "w") as f:
-    f.write(N)
-    f.write("\n")
-    f.write(T)
+  q_function=[]
+  for ding in N:
+    q_function.append(5.0e-7 * (ding**2) )
+
 
   fig, ax = plt.subplots(1,2, figsize=(15,5))
 
-  ax[0].plot(N,T)
+  ax[0].plot(N,T, label="Avg. execution time <T> vs graph size N")
+  ax[0].plot(N,q_function, label='T=5.0E-7 N^2')
   ax[1].plot(np.log(N),np.log(T))
-
+  ax[1].plot(np.log(N),np.log(q_function))
   ax[0].set(title='Avg. execution time <T> vs graph size N', xlabel='N', ylabel='<T> [s]')
   ax[1].set(title='Avg. execution time <T> vs graph size N', xlabel='log(N)', ylabel='log<T>')
+  fig.legend()
 
   fig.tight_layout()
 
